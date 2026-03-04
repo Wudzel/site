@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SilentTab V2.1</title>
+</head>
+<body>
+<script>
+(function(){
+
+var panicKey='e';
+var listening=false;
+var currentTheme=0;
+var adBlock=true;
+
+var themes=[
+{name:'Purple',a:'#6c63ff',b:'#00d4ff'},
+{name:'Red',a:'#ff4444',b:'#ff8800'},
+{name:'Green',a:'#00c853',b:'#00e5ff'},
+{name:'Pink',a:'#ff0099',b:'#ff6ecc'},
+{name:'Gold',a:'#f5a623',b:'#f8e71c'},
+{name:'White',a:'#ffffff',b:'#aaaaaa'}
+];
+
+var style=document.createElement('style');
+style.textContent='@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.st-panel{animation:fadeIn 0.2s ease forwards;}.st-keybind{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:28px;padding:0 8px;background:#1a1a1a;border:1px solid #333;border-radius:5px;color:#fff;font-size:11px;font-family:"Segoe UI",sans-serif;cursor:pointer;letter-spacing:1px;transition:border-color 0.2s,background 0.2s;}.st-keybind:hover{border-color:#555;background:#222;}';
+document.head.appendChild(style);
+
+var ownNodes=new Set();
+
+window.open=function(){return null;};
+window.alert=function(){};
+window.confirm=function(){return false;};
+window.prompt=function(){return null;};
+
+var navGuard=function(e){
+e.preventDefault();
+e.stopImmediatePropagation();
+return false;
+};
+
+window.addEventListener('beforeunload',navGuard,true);
+window.addEventListener('blur',function(){
+setTimeout(function(){window.focus();},0);
+},true);
+
+function dismissOverlay(){
+overlay.style.opacity='0';
+setTimeout(function(){
+if(overlay.parentNode)overlay.parentNode.removeChild(overlay);
+},600);
+}
+
+var overlay=document.createElement('div');
+overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;transition:opacity 0.6s ease;';
+var title=document.createElement('div');
+title.innerText='Welcome';
+title.style.cssText='color:#fff;font-size:48px;font-weight:bold;letter-spacing:8px;animation:pulse 1.5s infinite;';
+overlay.appendChild(title);
+document.body.appendChild(overlay);
+
+var iframe=document.createElement('iframe');
+iframe.src='https://www.google.com';
+iframe.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:1000;';
+iframe.onload=function(){
+dismissOverlay();
+};
+
+document.body.appendChild(iframe);
+
+document.addEventListener('keydown',function(e){
+if(e.key.toLowerCase()===panicKey){
+window.removeEventListener('beforeunload',navGuard,true);
+[iframe,overlay,style].forEach(function(el){
+if(el&&el.parentNode)el.parentNode.removeChild(el);
+});
+}
+});
+
+})();
+</script>
+</body>
+</html>
